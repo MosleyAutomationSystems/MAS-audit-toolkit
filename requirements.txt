@@ -1,0 +1,4 @@
+requests==2.32.3            #fetch a webpage when you pass a URL as input. handles redirects, timeouts, and error states
+beautifulsoup4==4.13.4      #parse and navigate HTML and XML documents  import it as bs4 in code
+lxml==5.3.2                 #high-performance XML and HTML processing library
+truststore==0.10.1          #provides a collection of trusted CA certificates for secure HTTPS connections  
