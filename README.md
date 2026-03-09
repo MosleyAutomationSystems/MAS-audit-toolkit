@@ -24,17 +24,24 @@ testing, screen reader evaluation, or certified accessibility auditing.
 
 ## What It Does
 
-Runs ten automated accessibility checks against any webpage or local HTML file:
+Runs ten automated accessibility checks against any webpage or local HTML file.
+Findings are grouped into three severity levels — Critical, Moderate, and Minor —
+so the most urgent issues are always addressed first.
 
+**Critical — Immediate Accessibility Barriers**
 - **Alt Text** — flags `<img>` elements missing an `alt` attribute (WCAG 1.1.1)
-- **H1 Count** — verifies exactly one `<h1>` exists per page (WCAG 1.3.1)
-- **Heading Descent** — detects skipped heading levels, e.g. h1 → h4 (WCAG 2.4.6)
 - **Form Labels** — finds `<input>` elements with no associated label (WCAG 1.3.1)
 - **Language Attribute** — checks for a valid `lang` attribute on `<html>` (WCAG 3.1.1)
 - **Tabindex Abuse** — flags positive `tabindex` values that disrupt focus order (WCAG 2.4.3)
 - **Empty Links** — finds `<a>` elements with no accessible name (WCAG 2.4.4)
 - **Empty Buttons** — finds `<button>` elements with no accessible name (WCAG 4.1.2)
+
+**Moderate — Usability Issues**
+- **H1 Count** — verifies exactly one `<h1>` exists per page (WCAG 1.3.1)
+- **Heading Descent** — detects skipped heading levels, e.g. h1 → h4 (WCAG 2.4.6)
 - **Autoplay Media** — flags `<video>` and `<audio>` elements with autoplay (WCAG 1.4.2)
+
+**Minor — Quality Improvements**
 - **PDF Link Warnings** — finds PDF links whose text does not warn the user (WCAG 2.4.4)
 
 Reports are deterministic and reproducible. Running the same audit on the same page
@@ -50,26 +57,37 @@ Every run produces:
 
 ```
 ------------------------------------------------------------
-MAS Accessibility Audit Toolkit v1.0.0
+MAS Accessibility Audit Toolkit v1.1.0
 Source: https://example.com
-Date: 2026-03-05 02:43:21
+Date: 2026-03-09 00:17:39
 ------------------------------------------------------------
 
-[!] Alt Text — WCAG 1.1.1 (Level A)
-     <img> missing alt attribute: src="hero-banner.jpg"
+[>] 3 finding(s) — 2 critical, 1 moderate, 0 minor
 
-[!] Heading Structure — WCAG 2.4.6 (Level AA)
-     Heading level skipped — jumped from h2 to h5: "Our Services"
-
-[!] Empty Button — WCAG 4.1.2 (Level A)
-     <button type="button"> has no accessible name. id="menu-toggle"
-
-[OK] Language Attribute — WCAG 3.1.1 (Level A)
-     lang attribute present and non-empty: "en"
-
-[>] Report saved to: output/audit_20260305_024321_example.com.txt
 ------------------------------------------------------------
-3 finding(s). Review complete.
+
+[!] CRITICAL — Immediate Accessibility Barriers
+    These issues prevent access for users with disabilities.
+
+  [1] Alt Text — WCAG 1.1.1 (Level A)
+       <img> missing alt attribute: src="hero-banner.jpg"
+
+  [2] Empty Button — WCAG 4.1.2 (Level A)
+       <button type="button"> has no accessible name. id="menu-toggle"
+
+------------------------------------------------------------
+
+[!] MODERATE — Usability Issues
+    These issues significantly affect usability.
+
+  [3] Heading Structure — WCAG 1.3.1 (Level A)
+       Page has 2 <h1> elements — there must be exactly one
+
+------------------------------------------------------------
+
+[>] Checks performed: alt text, heading structure, form labels, lang attribute,
+    tabindex abuse, empty links, empty buttons, autoplay media, PDF link warnings.
+------------------------------------------------------------
 ```
 
 ---
@@ -132,12 +150,12 @@ py audit.py --help
 
 Reports are saved to the `/output` directory with timestamped filenames:
 ```
-output/audit_20260305_010007_example.com.txt
+output/audit_20260309_001739_www.michigan.gov.txt
 ```
 
 Logs are saved to the `/logs` directory:
 ```
-logs/audit_2026-03-05.log
+logs/audit_2026-03-09.log
 ```
 
 ---
@@ -155,15 +173,15 @@ MAS-audit-toolkit/
 ├── gui_settings.json     — Persisted GUI preferences (auto-generated on first run)
 ├── checks/
 │   ├── __init__.py
-│   ├── alt_text.py       — WCAG 1.1.1 alt attribute check
-│   ├── headings.py       — WCAG 1.3.1 / 2.4.6 heading checks
-│   ├── labels.py         — WCAG 1.3.1 form label check
-│   ├── lang_attr.py      — WCAG 3.1.1 language attribute check
-│   ├── tabindex.py       — WCAG 2.4.3 tabindex abuse check
-│   ├── empty_links.py    — WCAG 2.4.4 empty link check
-│   ├── empty_buttons.py  — WCAG 4.1.2 empty button check
-│   ├── autoplay.py       — WCAG 1.4.2 autoplay media check
-│   └── pdf_links.py      — WCAG 2.4.4 PDF link warning check
+│   ├── alt_text.py       — WCAG 1.1.1 alt attribute check (Critical)
+│   ├── headings.py       — WCAG 1.3.1 / 2.4.6 heading checks (Moderate)
+│   ├── labels.py         — WCAG 1.3.1 form label check (Critical)
+│   ├── lang_attr.py      — WCAG 3.1.1 language attribute check (Critical)
+│   ├── tabindex.py       — WCAG 2.4.3 tabindex abuse check (Critical)
+│   ├── empty_links.py    — WCAG 2.4.4 empty link check (Critical)
+│   ├── empty_buttons.py  — WCAG 4.1.2 empty button check (Critical)
+│   ├── autoplay.py       — WCAG 1.4.2 autoplay media check (Moderate)
+│   └── pdf_links.py      — WCAG 2.4.4 PDF link warning check (Minor)
 ├── utils/
 │   ├── __init__.py
 │   ├── fetcher.py        — URL and file HTML loader
