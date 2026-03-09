@@ -782,13 +782,60 @@ class AuditApp(tk.Tk):
                 self._write_result(
                     f"{CUE_SUCCESS}No accessibility issues detected.\n", tag="success")
             else:
+                # Group findings by severity before display.
+                severity_order = ["critical", "moderate", "minor"]
+                severity_labels = {
+                    "critical": "CRITICAL — Immediate Accessibility Barriers",
+                    "moderate": "MODERATE — Usability Issues",
+                    "minor":    "MINOR — Quality Improvements",
+                }
+                severity_descriptions = {
+                    "critical": "These issues prevent access for users with disabilities.",
+                    "moderate": "These issues significantly affect usability.",
+                    "minor":    "These issues are best-practice improvements.",
+                }
+
+                grouped = {level: [] for level in severity_order}
+                for f in all_findings:
+                    level = f.get("severity", "minor")
+                    if level not in grouped:
+                        level = "minor"
+                    grouped[level].append(f)
+
+                total    = len(all_findings)
+                critical = len(grouped["critical"])
+                moderate = len(grouped["moderate"])
+                minor    = len(grouped["minor"])
+
                 self._write_result(
-                    f"{CUE_INFO}{len(all_findings)} finding(s):\n\n", tag="heading")
-                for i, f in enumerate(all_findings, start=1):
+                    f"{CUE_INFO}{total} finding(s) — "
+                    f"{critical} critical, {moderate} moderate, {minor} minor\n\n",
+                    tag="heading")
+
+                finding_number = 1
+                for level in severity_order:
+                    level_findings = grouped[level]
+                    if not level_findings:
+                        continue
+
                     self._write_result(
-                        f"{CUE_ERROR}[{i}] {f['check']} — WCAG {f['wcag']} "
-                        f"(Level {f['level']})\n", tag="heading")
-                    self._write_result(f"     {f['message']}\n\n", tag="error")
+                        f"{CUE_ERROR}{severity_labels[level]}\n",
+                        tag="heading")
+                    self._write_result(
+                        f"     {severity_descriptions[level]}\n\n",
+                        tag="muted")
+
+                    for f in level_findings:
+                        self._write_result(
+                            f"  [{finding_number}] {f['check']} "
+                            f"— WCAG {f['wcag']} (Level {f['level']})\n",
+                            tag="heading")
+                        self._write_result(
+                            f"       {f['message']}\n\n",
+                            tag="error")
+                        finding_number += 1
+
+                    self._write_result("─" * 40 + "\n\n", tag="muted")
 
             report_path = generate_report(source, all_findings)
             self._write_result(
