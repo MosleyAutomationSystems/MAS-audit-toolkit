@@ -63,7 +63,7 @@ def check_pdf_links(soup: BeautifulSoup) -> list:
                 "check":    "PDF Link Warning",
                 "wcag":     "2.4.4",
                 "level":    "A",
-                "severity": "warning",
+                "severity": "minor",
                 "message":  (
                     f'Link points to a PDF but does not warn the user — '
                     f'add "(PDF)" to the link text. '
