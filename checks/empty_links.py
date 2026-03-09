@@ -65,7 +65,7 @@ def check_empty_links(soup: BeautifulSoup) -> list:
             "check":    "Empty Link",
             "wcag":     "2.4.4",
             "level":    "A",
-            "severity": "error",
+            "severity": "critical",
             "message":  (
                 f'<a> has no accessible name — screen readers will announce '
                 f'"link" with no context. href="{href}"'
