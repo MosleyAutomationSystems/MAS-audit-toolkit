@@ -54,7 +54,7 @@ def check_autoplay(soup: BeautifulSoup) -> list:
             "check":    "Autoplay Media",
             "wcag":     "1.4.2",
             "level":    "A",
-            "severity": "error",
+            "severity": "moderate",
             "message":  (
                 f'<{tag}> has autoplay enabled — {controls_note}. '
                 f'src="{src}"'
