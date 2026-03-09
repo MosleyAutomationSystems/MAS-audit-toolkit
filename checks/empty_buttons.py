@@ -71,7 +71,7 @@ def check_empty_buttons(soup: BeautifulSoup) -> list:
             "check":    "Empty Button",
             "wcag":     "4.1.2",
             "level":    "A",
-            "severity": "error",
+            "severity": "critical",
             "message":  (
                 f'<{tag} type="{type_}"> has no accessible name — '
                 f'screen readers will announce "button" with no context. '
