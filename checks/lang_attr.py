@@ -61,7 +61,7 @@ def check_lang_attr(soup: BeautifulSoup) -> list:
             "check": "Language Attribute",
             "wcag": "3.1.1",
             "level": "A",
-            "severity": "error",
+            "severity": "critical",
             "message": '<html> element has an empty lang attribute — must specify a language (e.g. lang="en")'
         })
 
