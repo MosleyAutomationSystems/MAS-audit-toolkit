@@ -42,7 +42,7 @@ def check_headings(soup: BeautifulSoup) -> list:
             "check": "Heading Structure",
             "wcag": "1.3.1",
             "level": "A",
-            "severity": "error",
+            "severity": "moderate",
             "message": "Page has no <h1> element — every page must have exactly one"
         })
 
@@ -52,7 +52,7 @@ def check_headings(soup: BeautifulSoup) -> list:
             "check": "Heading Structure",
             "wcag": "1.3.1",
             "level": "A",
-            "severity": "error",
+            "severity": "moderate",
             "message": f"Page has {len(h1_tags)} <h1> elements — there must be exactly one"
         })
 
@@ -85,7 +85,7 @@ def check_headings(soup: BeautifulSoup) -> list:
                 "check": "Heading Structure",
                 "wcag": "2.4.6",
                 "level": "AA",
-                "severity": "error",
+                "severity": "moderate",
                 "message": (
                     f"Heading level skipped — jumped from h{prev_level} "
                     f"to h{current_level}: \"{text}\""
