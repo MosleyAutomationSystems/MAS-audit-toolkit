@@ -23,43 +23,35 @@ def fetch_from_url(url: str) -> str | None:
         str: The raw HTML content of the page, or None if the request failed.
     """
 
-    # Log that we are about to make a network request.
     masLog(f"Fetching URL: {url}")
 
     try:
-        # requests.get() sends an HTTP GET request to the URL.
-        # timeout= prevents the tool from hanging indefinitely on slow servers.
-        # headers= sends our User-Agent string so servers don't block us as a bot.
-        # Both values come from config.py — no magic numbers here.
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/122.0.0.0 Safari/537.36"
+            )
+        }
         response = requests.get(
             url,
             timeout=config.REQUEST_TIMEOUT,
-            headers=config.REQUEST_HEADERS,
-            verify=certifi.where()
+            headers=headers
         )
-
-        # raise_for_status() checks the HTTP response code.
-        # If the server returned 404, 500, or any error code, this raises
-        # an HTTPError exception rather than silently returning bad content.
         response.raise_for_status()
 
         masLog(f"Successfully fetched URL: {url} (status {response.status_code})")
-
-        # response.text returns the page content decoded as a string.
         return response.text
 
     except requests.exceptions.Timeout:
-        # The server took longer than REQUEST_TIMEOUT seconds to respond.
         masLog(f"Request timed out for URL: {url}", level="error")
         return None
 
     except requests.exceptions.HTTPError as e:
-        # The server responded but with an error status code (4xx or 5xx).
         masLog(f"HTTP error for URL: {url} — {e}", level="error")
         return None
 
     except requests.exceptions.RequestException as e:
-        # Catch-all for any other network error (DNS failure, no connection, etc.)
         masLog(f"Network error for URL: {url} — {e}", level="error")
         return None
 
