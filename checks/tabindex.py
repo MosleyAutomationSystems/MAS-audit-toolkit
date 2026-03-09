@@ -55,7 +55,7 @@ def check_tabindex(soup: BeautifulSoup) -> list:
                 "check":    "Keyboard Trap / Focus Order",
                 "wcag":     "2.4.3",
                 "level":    "A",
-                "severity": "error",
+                "severity": "critical",
                 "message":  (
                     f'<{tag}> has tabindex="{value}" — '
                     f'positive tabindex disrupts natural focus order. '
