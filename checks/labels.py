@@ -87,7 +87,7 @@ def check_labels(soup: BeautifulSoup) -> list:
             "check": "Form Labels",
             "wcag": "1.3.1",
             "level": "A",
-            "severity": "error",
+            "severity": "critical",
             "message": (
                 f'<input type="{input_type}"> missing label — '
                 f'name="{input_name}", id="{input_id_display}"'
