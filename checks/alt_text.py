@@ -54,7 +54,7 @@ def check_alt_text(soup: BeautifulSoup) -> list:
                 "check": "Alt Text",
                 "wcag": "1.1.1",
                 "level": "A",
-                "severity": "error",
+                "severity": "critical",
                 "message": f'<img> missing alt attribute — src="{src}"'
             }
 
