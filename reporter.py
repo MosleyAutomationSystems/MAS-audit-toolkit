@@ -1,6 +1,7 @@
 # reporter.py
-# Formats audit findings into a structured plain-text report and saves
-# it to the output directory. This is the only module that writes files.
+# Generates a timestamped plain-text audit report grouped by severity.
+# Mosley Standard compliant — findings sorted Critical > Moderate > Minor.
+# Non-color cues ([!], [OK], [>]) used throughout — no color-only indicators.
 
 import os
 from datetime import datetime
@@ -8,83 +9,135 @@ from datetime import datetime
 import config
 from utils.logger import masLog
 
+# Severity display order — Critical first, Minor last.
+SEVERITY_ORDER = ["critical", "moderate", "minor"]
+
+# Human-readable labels and prefix cues for each severity level.
+SEVERITY_META = {
+    "critical": {
+        "label":       "CRITICAL — Immediate Accessibility Barriers",
+        "prefix":      "[!]",
+        "description": "These issues prevent access for users with disabilities.",
+    },
+    "moderate": {
+        "label":       "MODERATE — Usability Issues",
+        "prefix":      "[!]",
+        "description": "These issues significantly affect usability and should be addressed promptly.",
+    },
+    "minor": {
+        "label":       "MINOR — Quality Improvements",
+        "prefix":      "[>]",
+        "description": "These issues are best-practice improvements.",
+    },
+}
+
+
+def _sanitize_source(source: str) -> str:
+    """
+    Convert a URL or file path into a safe filename fragment.
+    Replaces characters that are invalid in Windows and Unix filenames.
+    """
+    safe = source.replace("https://", "").replace("http://", "")
+    for char in r'\/: *?"<>|':
+        safe = safe.replace(char, "_")
+    return safe[:60]
+
+
 def generate_report(source: str, findings: list) -> str:
     """
-    Build a plain-text audit report and save it to the output directory.
+    Write a plain-text audit report grouped by severity to the output directory.
 
     Parameters:
-        source (str): The URL or file path that was audited.
-        findings (list): Combined list of all finding dictionaries from all checks.
+        source   (str):  The audited URL or file path.
+        findings (list): List of finding dictionaries from the check modules.
 
     Returns:
-        str: The full file path of the saved report.
+        str: Absolute path to the saved report file.
     """
 
-    masLog(f"Generating report for: {source}")
+    timestamp   = datetime.now()
+    date_str    = timestamp.strftime("%Y%m%d_%H%M%S")
+    safe_source = _sanitize_source(source)
+    filename    = f"audit_{date_str}_{safe_source}.txt"
+    report_path = os.path.join(config.OUTPUT_DIR, filename)
 
-    # Build the report as a list of lines, then join them at the end.
-    # This is cleaner than string concatenation and easier to maintain.
+    masLog(f"Generating report: {filename}")
+
+    # Group findings by severity level.
+    grouped = {level: [] for level in SEVERITY_ORDER}
+    for finding in findings:
+        level = finding.get("severity", "minor")
+        if level not in grouped:
+            level = "minor"
+        grouped[level].append(finding)
+
     lines = []
 
-    # --- Header ---
+    # ── Header ──
     lines.append(config.REPORT_SEPARATOR)
     lines.append(f"{config.TOOL_NAME} v{config.TOOL_VERSION}")
-    lines.append(f"Report generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"Source audited:   {source}")
-    lines.append(f"Total findings:   {len(findings)}")
+    lines.append(f"Source : {source}")
+    lines.append(f"Date   : {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(config.REPORT_SEPARATOR)
     lines.append("")
 
-    # --- Findings ---
-    if not findings:
-        # No issues found — report a clean pass.
-        lines.append("RESULT: No accessibility issues detected by this audit.")
+    # ── Summary ──
+    total = len(findings)
+    if total == 0:
+        lines.append("[OK] No accessibility issues detected.")
         lines.append("")
-        lines.append("Note: This automated audit covers a defined subset of")
-        lines.append("WCAG 2.1 AA criteria. Manual testing is always recommended.")
     else:
-        lines.append("FINDINGS:")
+        critical_count = len(grouped["critical"])
+        moderate_count = len(grouped["moderate"])
+        minor_count    = len(grouped["minor"])
+
+        lines.append(f"[>] {total} finding(s) total:")
+        lines.append(f"    [!] Critical : {critical_count}")
+        lines.append(f"    [!] Moderate : {moderate_count}")
+        lines.append(f"    [>] Minor    : {minor_count}")
+        lines.append("")
+        lines.append(config.REPORT_SEPARATOR)
         lines.append("")
 
-        # Number each finding so the report is easy to reference.
-        for i, finding in enumerate(findings, start=1):
-            lines.append(f"  [{i}] {finding['check']} — WCAG {finding['wcag']} (Level {finding['level']})")
-            lines.append(f"      Severity: {finding['severity'].upper()}")
-            lines.append(f"      {finding['message']}")
+        # ── Findings grouped by severity ──
+        finding_number = 1
+        for level in SEVERITY_ORDER:
+            level_findings = grouped[level]
+            if not level_findings:
+                continue
+
+            meta = SEVERITY_META[level]
+            lines.append(f"{meta['prefix']} {meta['label']}")
+            lines.append(f"    {meta['description']}")
             lines.append("")
 
-    # --- Footer ---
+            for finding in level_findings:
+                lines.append(
+                    f"  [{finding_number}] {finding['check']} "
+                    f"— WCAG {finding['wcag']} (Level {finding['level']})"
+                )
+                lines.append(f"       {finding['message']}")
+                lines.append("")
+                finding_number += 1
+
+            lines.append(config.REPORT_SEPARATOR)
+            lines.append("")
+
+    # ── Footer ──
+    lines.append("[>] Checks performed:")
+    lines.append("    alt text, heading structure, form labels, lang attribute,")
+    lines.append("    tabindex abuse, empty links, empty buttons,")
+    lines.append("    autoplay media, PDF link warnings.")
+    lines.append("")
+    lines.append(
+        "Note: This report covers a defined subset of WCAG 2.1 AA criteria. "
+        "Findings are risk indicators, not compliance verdicts."
+    )
     lines.append(config.REPORT_SEPARATOR)
-    lines.append("SCOPE NOTE:")
-    lines.append("This report was generated by the MAS Accessibility Audit Toolkit.")
-    lines.append("Checks performed: alt text, heading structure, form labels, lang attribute,")
-    lines.append("tabindex abuse, empty links, empty buttons, autoplay media, PDF link warnings.")
-    lines.append("This is not a certification. Manual review is recommended.")
-    lines.append(config.REPORT_SEPARATOR)
 
-    # Join all lines into a single string with newlines between them.
-    report_text = "\n".join(lines)
+    # ── Write to file ──
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
-    # --- Save to output directory ---
-
-    # Generate a timestamped filename so each run produces a unique file.
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    # Sanitize the source string to make it safe as a filename.
-    # Replace characters that are illegal in Windows filenames with underscores.
-    safe_source = source.replace("https://", "").replace("http://", "")
-    for char in r'\/:*?"<>|':
-        safe_source = safe_source.replace(char, "_")
-
-    # Trim to 50 characters so filenames don't get unwieldy.
-    safe_source = safe_source[:50]
-
-    filename = f"audit_{timestamp}_{safe_source}.txt"
-    filepath = os.path.join(config.OUTPUT_DIR, filename)
-
-    # Write the report to disk.
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(report_text)
-
-    masLog(f"Report saved: {filepath}")
-    return filepath
+    masLog(f"Report saved: {report_path}")
+    return report_path
