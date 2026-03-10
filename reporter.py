@@ -205,7 +205,25 @@ def generate_report(source: str, findings: list) -> str:
 
             lines.append(config.REPORT_SEPARATOR)
             lines.append("")
+    # ── Accessibility Fix Guide ──
+    if findings:
+        lines.append("[>] ACCESSIBILITY FIX GUIDE")
+        lines.append("    One recommended fix per issue type detected.")
+        lines.append("")
 
+        seen_checks = set()
+        for finding in findings:
+            check_name = finding.get("check", "")
+            fix_hint   = finding.get("fix_hint", "")
+            if check_name in seen_checks or not fix_hint:
+                continue
+            seen_checks.add(check_name)
+            lines.append(f"  [>] {check_name}")
+            lines.append(f"       {fix_hint}")
+            lines.append("")
+
+        lines.append(config.REPORT_SEPARATOR)
+        lines.append("")
     # ── Footer ──
     lines.append("[>] Checks performed:")
     lines.append("    alt text, heading structure, form labels, lang attribute,")
