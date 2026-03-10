@@ -8,12 +8,19 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
-
+import config
+METADATA = {
+    "name":     "PDF Link Warning",
+    "wcag":     "2.4.4",
+    "level":    "A",
+    "severity": config.SEVERITY_LOW,
+    "fix_hint": 'Add "(PDF)" to the link text so users know the link opens a PDF — for example: "Annual Report (PDF)".',
+}
 # Warning indicators we accept as sufficient user notice in link text.
 # Case-insensitive match is applied when checking.
 PDF_WARNING_INDICATORS = ["pdf", "document", "download"]
 
-def check_pdf_links(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find links pointing to PDF files whose text does not warn the user.
 
@@ -24,7 +31,7 @@ def check_pdf_links(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for each unwarned PDF link.
     """
 
-    masLog("Running check: PDF links without user warning")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -60,15 +67,14 @@ def check_pdf_links(soup: BeautifulSoup) -> list:
             display_text = link.get_text(strip=True) or "[no text]"
 
             findings.append({
-                "check":    "PDF Link Warning",
-                "wcag":     "2.4.4",
-                "level":    "A",
-                "severity": "minor",
-                "message":  (
-                    f'Link points to a PDF but does not warn the user — '
-                    f'add "(PDF)" to the link text. '
-                    f'text="{display_text}", href="{display_href}"'
-                )
+                "check":    METADATA["name"],
+                "wcag":     METADATA["wcag"],
+                "level":    METADATA["level"],
+                "severity": METADATA["severity"],
+                "message":  f'Link points to a PDF but does not warn the user — add "(PDF)" to the link text. text="{display_text}", href="{display_href}"',
+                "element":  str(link),
+                "fix_hint": METADATA["fix_hint"],
+                "url":      url,
             })
 
     if findings:
