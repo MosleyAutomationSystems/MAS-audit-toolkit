@@ -7,8 +7,16 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Button Name Detection",
+    "wcag":     "4.1.2",
+    "level":    "A",
+    "severity": config.SEVERITY_CRITICAL,
+    "fix_hint": "Add an aria-label attribute, visible text content, or a child <img> with alt text to every button element.",
+}
 
-def check_empty_buttons(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all <button> elements that have no accessible name.
 
@@ -26,7 +34,7 @@ def check_empty_buttons(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for each nameless button.
     """
 
-    masLog("Running check: empty or nameless <button> elements")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -68,15 +76,14 @@ def check_empty_buttons(soup: BeautifulSoup) -> list:
         type_ = btn.get("type", "button")
 
         findings.append({
-            "check":    "Empty Button",
-            "wcag":     "4.1.2",
-            "level":    "A",
-            "severity": "critical",
-            "message":  (
-                f'<{tag} type="{type_}"> has no accessible name — '
-                f'screen readers will announce "button" with no context. '
-                f'id="{id_}"'
-            )
+            "check":    METADATA["name"],
+            "wcag":     METADATA["wcag"],
+            "level":    METADATA["level"],
+            "severity": METADATA["severity"],
+            "message":  f'<{tag} type="{type_}"> has no accessible name — screen readers will announce "button" with no context. id="{id_}"',
+            "element":  str(btn),
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     if findings:
