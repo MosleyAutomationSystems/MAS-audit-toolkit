@@ -8,8 +8,16 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Empty Link",
+    "wcag":     "2.4.4",
+    "level":    "A",
+    "severity": config.SEVERITY_CRITICAL,
+    "fix_hint": "Add descriptive text, an aria-label, or a child <img> with alt text to every <a> element that has an href.",
+}
 
-def check_empty_links(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all <a> elements that have no accessible name.
 
@@ -26,7 +34,7 @@ def check_empty_links(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for each nameless link.
     """
 
-    masLog("Running check: empty or nameless <a> elements")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -62,14 +70,14 @@ def check_empty_links(soup: BeautifulSoup) -> list:
         href = link.get("href", "[no href]")
 
         findings.append({
-            "check":    "Empty Link",
-            "wcag":     "2.4.4",
-            "level":    "A",
-            "severity": "critical",
-            "message":  (
-                f'<a> has no accessible name — screen readers will announce '
-                f'"link" with no context. href="{href}"'
-            )
+            "check":    METADATA["name"],
+            "wcag":     METADATA["wcag"],
+            "level":    METADATA["level"],
+            "severity": METADATA["severity"],
+            "message":  f'<a> has no accessible name — screen readers will announce "link" with no context. href="{href}"',
+            "element":  str(link),
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     if findings:
