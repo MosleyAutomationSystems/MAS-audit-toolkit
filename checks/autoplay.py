@@ -7,8 +7,16 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Autoplay Media",
+    "wcag":     "1.4.2",
+    "level":    "A",
+    "severity": config.SEVERITY_HIGH,
+    "fix_hint": "Remove the autoplay attribute from <video> and <audio> elements. If autoplay is required, ensure the element has a controls attribute so users can pause playback.",
+}
 
-def check_autoplay(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all <video> and <audio> elements with the autoplay attribute.
 
@@ -19,7 +27,7 @@ def check_autoplay(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for each autoplay element.
     """
 
-    masLog("Running check: autoplay on <video> and <audio> elements")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -51,14 +59,14 @@ def check_autoplay(soup: BeautifulSoup) -> list:
         )
 
         findings.append({
-            "check":    "Autoplay Media",
-            "wcag":     "1.4.2",
-            "level":    "A",
-            "severity": "moderate",
-            "message":  (
-                f'<{tag}> has autoplay enabled — {controls_note}. '
-                f'src="{src}"'
-            )
+            "check":    METADATA["name"],
+            "wcag":     METADATA["wcag"],
+            "level":    METADATA["level"],
+            "severity": METADATA["severity"],
+            "message":  f'<{tag}> has autoplay enabled — {controls_note}. src="{src}"',
+            "element":  str(el),
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     if findings:
