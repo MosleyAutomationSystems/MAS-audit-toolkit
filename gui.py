@@ -26,15 +26,15 @@ import config
 from utils.logger import masLog
 from utils.fetcher import load_html
 from bs4 import BeautifulSoup
-from checks.alt_text import check_alt_text
-from checks.headings import check_headings
-from checks.labels import check_labels
-from checks.lang_attr import check_lang_attr
-from checks.tabindex import check_tabindex
-from checks.empty_links import check_empty_links
-from checks.empty_buttons import check_empty_buttons
-from checks.autoplay import check_autoplay
-from checks.pdf_links import check_pdf_links
+from checks.alt_text      import run as check_alt_text
+from checks.headings      import run as check_headings
+from checks.labels        import run as check_labels
+from checks.lang_attr     import run as check_lang_attr
+from checks.tabindex      import run as check_tabindex
+from checks.empty_links   import run as check_empty_links
+from checks.empty_buttons import run as check_empty_buttons
+from checks.autoplay      import run as check_autoplay
+from checks.pdf_links     import run as check_pdf_links
 from reporter import generate_report
 
 SETTINGS_FILE = os.path.join(config.BASE_DIR, "gui_settings.json")
