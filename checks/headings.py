@@ -8,8 +8,16 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Heading Structure",
+    "wcag":     "1.3.1 / 2.4.6",
+    "level":    "AA",
+    "severity": config.SEVERITY_HIGH,
+    "fix_hint": "Ensure exactly one <h1> per page. Headings must descend logically — h1 → h2 → h3 — without skipping levels.",
+}
 
-def check_headings(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Run both heading checks: h1 count and heading descent order.
 
@@ -20,7 +28,7 @@ def check_headings(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries describing any issues found.
     """
 
-    masLog("Running check: heading structure")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -39,21 +47,27 @@ def check_headings(soup: BeautifulSoup) -> list:
     if len(h1_tags) == 0:
         # No h1 at all — the page has no primary heading.
         findings.append({
-            "check": "Heading Structure",
-            "wcag": "1.3.1",
-            "level": "A",
-            "severity": "moderate",
-            "message": "Page has no <h1> element — every page must have exactly one"
+            "check":    METADATA["name"],
+            "wcag":     "1.3.1",
+            "level":    "A",
+            "severity": METADATA["severity"],
+            "message":  "Page has no <h1> element — every page must have exactly one",
+            "element":  "",
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     elif len(h1_tags) > 1:
         # Multiple h1s — the page has ambiguous primary structure.
         findings.append({
-            "check": "Heading Structure",
-            "wcag": "1.3.1",
-            "level": "A",
-            "severity": "moderate",
-            "message": f"Page has {len(h1_tags)} <h1> elements — there must be exactly one"
+            "check":    METADATA["name"],
+            "wcag":     "1.3.1",
+            "level":    "A",
+            "severity": METADATA["severity"],
+            "message":  f"Page has {len(h1_tags)} <h1> elements — there must be exactly one",
+            "element":  str(h1_tags[0]),
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     # --- Check 3: Heading descent ---
@@ -82,14 +96,14 @@ def check_headings(soup: BeautifulSoup) -> list:
             text = heading.get_text(strip=True)
 
             findings.append({
-                "check": "Heading Structure",
-                "wcag": "2.4.6",
-                "level": "AA",
-                "severity": "moderate",
-                "message": (
-                    f"Heading level skipped — jumped from h{prev_level} "
-                    f"to h{current_level}: \"{text}\""
-                )
+                "check":    METADATA["name"],
+                "wcag":     "2.4.6",
+                "level":    "AA",
+                "severity": METADATA["severity"],
+                "message":  f'Heading level skipped — jumped from h{prev_level} to h{current_level}: "{text}"',
+                "element":  str(heading),
+                "fix_hint": METADATA["fix_hint"],
+                "url":      url,
             })
 
         # Update prev_level for the next iteration.
