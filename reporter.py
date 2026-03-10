@@ -10,24 +10,33 @@ import config
 from utils.logger import masLog
 
 # Severity display order — Critical first, Minor last.
-SEVERITY_ORDER = ["critical", "moderate", "minor"]
+SEVERITY_ORDER = ["critical", "high", "medium", "low", "info"]
 
-# Human-readable labels and prefix cues for each severity level.
 SEVERITY_META = {
     "critical": {
         "label":       "CRITICAL — Immediate Accessibility Barriers",
         "prefix":      "[!]",
-        "description": "These issues prevent access for users with disabilities.",
+        "description": "These issues block access entirely for users with disabilities.",
     },
-    "moderate": {
-        "label":       "MODERATE — Usability Issues",
+    "high": {
+        "label":       "HIGH — Significant Usability Issues",
         "prefix":      "[!]",
         "description": "These issues significantly affect usability and should be addressed promptly.",
     },
-    "minor": {
-        "label":       "MINOR — Quality Improvements",
+    "medium": {
+        "label":       "MEDIUM — Moderate Usability Issues",
+        "prefix":      "[!]",
+        "description": "These issues affect some users and should be scheduled for remediation.",
+    },
+    "low": {
+        "label":       "LOW — Quality Improvements",
         "prefix":      "[>]",
-        "description": "These issues are best-practice improvements.",
+        "description": "These issues are best-practice improvements that reduce friction.",
+    },
+    "info": {
+        "label":       "INFO — Informational",
+        "prefix":      "[>]",
+        "description": "These items are noted for awareness and do not require immediate action.",
     },
 }
 
@@ -88,16 +97,17 @@ def generate_report(source: str, findings: list) -> str:
         lines.append("")
     else:
         critical_count = len(grouped["critical"])
-        moderate_count = len(grouped["moderate"])
-        minor_count    = len(grouped["minor"])
+        high_count     = len(grouped["high"])
+        medium_count   = len(grouped["medium"])
+        low_count      = len(grouped["low"])
+        info_count     = len(grouped["info"])
 
         lines.append(f"[>] {total} finding(s) total:")
         lines.append(f"    [!] Critical : {critical_count}")
-        lines.append(f"    [!] Moderate : {moderate_count}")
-        lines.append(f"    [>] Minor    : {minor_count}")
-        lines.append("")
-        lines.append(config.REPORT_SEPARATOR)
-        lines.append("")
+        lines.append(f"    [!] High     : {high_count}")
+        lines.append(f"    [!] Medium   : {medium_count}")
+        lines.append(f"    [>] Low      : {low_count}")
+        lines.append(f"    [>] Info     : {info_count}")
 
         # ── Findings grouped by severity ──
         finding_number = 1
