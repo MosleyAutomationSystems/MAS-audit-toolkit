@@ -102,6 +102,10 @@ def load_html(source: str) -> str | None:
         str: Raw HTML content, or None if validation or loading failed.
     """
 
+    # Normalize bare domains — add https:// if no scheme is present.
+    if not source.strip().lower().startswith(("http://", "https://", "/", ".", "\\")):
+        source = "https://" + source.strip()
+
     # If the source starts with http:// or https://, treat it as a URL.
     if source.strip().lower().startswith("http"):
         if not validate_url(source):
