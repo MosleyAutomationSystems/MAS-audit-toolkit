@@ -75,9 +75,9 @@ def generate_report(source: str, findings: list) -> str:
     # Group findings by severity level.
     grouped = {level: [] for level in SEVERITY_ORDER}
     for finding in findings:
-        level = finding.get("severity", "minor")
+        level = finding.get("severity", "low")
         if level not in grouped:
-            level = "minor"
+            level = "low"
         grouped[level].append(finding)
 
     lines = []
@@ -93,7 +93,9 @@ def generate_report(source: str, findings: list) -> str:
     # ── Summary ──
     total = len(findings)
     if total == 0:
-        lines.append("[OK] No accessibility issues detected.")
+        lines.append("[OK] PASS — No accessibility issues detected.")
+        lines.append("")
+        lines.append("     All checks passed. No findings to report.")
         lines.append("")
     else:
         critical_count = len(grouped["critical"])
@@ -102,12 +104,37 @@ def generate_report(source: str, findings: list) -> str:
         low_count      = len(grouped["low"])
         info_count     = len(grouped["info"])
 
-        lines.append(f"[>] {total} finding(s) total:")
+        # WCAG level breakdown
+        level_a_count  = sum(1 for f in findings if f.get("level") == "A")
+        level_aa_count = sum(1 for f in findings if f.get("level") == "AA")
+        level_aaa_count = sum(1 for f in findings if f.get("level") == "AAA")
+
+        # Blocking count — critical + high require immediate action
+        blocking = critical_count + high_count
+
+        status = "[!] FAIL" if blocking > 0 else "[>] REVIEW"
+
+        lines.append(f"{status} — {total} finding(s) detected")
+        lines.append("")
+        lines.append("  By severity:")
         lines.append(f"    [!] Critical : {critical_count}")
         lines.append(f"    [!] High     : {high_count}")
         lines.append(f"    [!] Medium   : {medium_count}")
         lines.append(f"    [>] Low      : {low_count}")
         lines.append(f"    [>] Info     : {info_count}")
+        lines.append("")
+        lines.append("  By WCAG level:")
+        lines.append(f"    [>] Level A   : {level_a_count}")
+        lines.append(f"    [>] Level AA  : {level_aa_count}")
+        lines.append(f"    [>] Level AAA : {level_aaa_count}")
+        lines.append("")
+        if blocking > 0:
+            lines.append(f"  [!] {blocking} blocking issue(s) require immediate attention.")
+        else:
+            lines.append("  [>] No blocking issues. Review low/info findings.")
+        lines.append("")
+        lines.append(config.REPORT_SEPARATOR)
+        lines.append("")
 
         # ── Findings grouped by severity ──
         finding_number = 1
@@ -136,8 +163,9 @@ def generate_report(source: str, findings: list) -> str:
     # ── Footer ──
     lines.append("[>] Checks performed:")
     lines.append("    alt text, heading structure, form labels, lang attribute,")
-    lines.append("    tabindex abuse, empty links, empty buttons,")
-    lines.append("    autoplay media, PDF link warnings.")
+    lines.append("    tabindex abuse, empty links, empty buttons, autoplay media,")
+    lines.append("    PDF link warnings, page title, duplicate IDs,")
+    lines.append("    landmark roles, skip navigation link.")
     lines.append("")
     lines.append(
         "Note: This report covers a defined subset of WCAG 2.1 AA criteria. "
