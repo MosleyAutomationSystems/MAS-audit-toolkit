@@ -7,6 +7,14 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Form Labels",
+    "wcag":     "1.3.1",
+    "level":    "A",
+    "severity": config.SEVERITY_CRITICAL,
+    "fix_hint": "Associate every <input> with a <label> using matching for= and id= attributes, nest the input inside a <label>, or add an aria-label attribute.",
+}
 
 # Input types that do not require a visible label.
 # submit/reset/button have their label in their value attribute.
@@ -14,7 +22,7 @@ from utils.logger import masLog
 # image inputs use alt text instead of a label.
 EXEMPT_INPUT_TYPES = {"submit", "reset", "button", "hidden", "image"}
 
-def check_labels(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all <input> elements that lack a proper label association.
 
@@ -31,7 +39,7 @@ def check_labels(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for unlabeled inputs.
     """
 
-    masLog("Running check: <label> associations on <input> elements")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -84,14 +92,14 @@ def check_labels(soup: BeautifulSoup) -> list:
         input_id_display = input_id if input_id else "[no id]"
 
         findings.append({
-            "check": "Form Labels",
-            "wcag": "1.3.1",
-            "level": "A",
-            "severity": "critical",
-            "message": (
-                f'<input type="{input_type}"> missing label — '
-                f'name="{input_name}", id="{input_id_display}"'
-            )
+            "check":    METADATA["name"],
+            "wcag":     METADATA["wcag"],
+            "level":    METADATA["level"],
+            "severity": METADATA["severity"],
+            "message":  f'<input type="{input_type}"> missing label — name="{input_name}", id="{input_id_display}"',
+            "element":  str(inp),
+            "fix_hint": METADATA["fix_hint"],
+            "url":      url,
         })
 
     if findings:
