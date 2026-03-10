@@ -26,15 +26,9 @@ import config
 from utils.logger import masLog
 from utils.fetcher import load_html
 from bs4 import BeautifulSoup
-from checks.alt_text      import run as check_alt_text
-from checks.headings      import run as check_headings
-from checks.labels        import run as check_labels
-from checks.lang_attr     import run as check_lang_attr
-from checks.tabindex      import run as check_tabindex
-from checks.empty_links   import run as check_empty_links
-from checks.empty_buttons import run as check_empty_buttons
-from checks.autoplay      import run as check_autoplay
-from checks.pdf_links     import run as check_pdf_links
+import importlib
+import pkgutil
+import checks
 from reporter import generate_report
 
 SETTINGS_FILE = os.path.join(config.BASE_DIR, "gui_settings.json")
@@ -768,15 +762,10 @@ class AuditApp(tk.Tk):
             soup = BeautifulSoup(html, config.HTML_PARSER)
 
             all_findings = []
-            all_findings.extend(check_alt_text(soup))
-            all_findings.extend(check_headings(soup))
-            all_findings.extend(check_labels(soup))
-            all_findings.extend(check_lang_attr(soup))
-            all_findings.extend(check_tabindex(soup))
-            all_findings.extend(check_empty_links(soup))
-            all_findings.extend(check_empty_buttons(soup))
-            all_findings.extend(check_autoplay(soup))
-            all_findings.extend(check_pdf_links(soup))
+            for finder, module_name, _ in pkgutil.iter_modules(checks.__path__):
+                module = importlib.import_module(f"checks.{module_name}")
+                if hasattr(module, "run"):
+                    all_findings.extend(module.run(soup, source))
 
             if not all_findings:
                 self._write_result(
