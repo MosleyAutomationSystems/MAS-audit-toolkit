@@ -763,6 +763,9 @@ class AuditApp(tk.Tk):
 
             all_findings = []
             for finder, module_name, _ in pkgutil.iter_modules(checks.__path__):
+                module_config = config.MODULES.get(module_name, {})
+                if not module_config.get("enabled", True):
+                    continue
                 module = importlib.import_module(f"checks.{module_name}")
                 if hasattr(module, "run"):
                     all_findings.extend(module.run(soup, source))
