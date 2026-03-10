@@ -4,10 +4,19 @@
 # Every <img> must have an alt attribute. Decorative images must use alt=""
 # explicitly. A missing alt attribute is always a failure.
 
+from logging import config
 from bs4 import BeautifulSoup
+import config
 from utils.logger import masLog
+METADATA = {
+    "name":     "Alt Text Detector",
+    "wcag":     "1.1.1",
+    "level":    "A",
+    "severity": config.SEVERITY_CRITICAL,
+    "fix_hint": "Add an alt attribute to every <img> element. Use a descriptive value for informative images. Use alt='' for decorative images.",
+}
 
-def check_alt_text(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all <img> elements missing a valid alt attribute.
 
@@ -19,7 +28,7 @@ def check_alt_text(soup: BeautifulSoup) -> list:
               one failing <img> element. Empty list means no issues found.
     """
 
-    masLog("Running check: alt text on <img> elements")
+    masLog(f"Running check: {METADATA['name']}")
 
     # findings is the list we will return. Each item will be a dictionary
     # describing one issue found. We start empty and add to it as we find problems.
@@ -51,12 +60,15 @@ def check_alt_text(soup: BeautifulSoup) -> list:
             # Every check in this toolkit returns findings in this same format
             # so the report writer can handle them all the same way.
             finding = {
-                "check": "Alt Text",
-                "wcag": "1.1.1",
-                "level": "A",
-                "severity": "critical",
-                "message": f'<img> missing alt attribute — src="{src}"'
-            }
+                "check":    METADATA["name"],
+                "wcag":     METADATA["wcag"],
+                "level":    METADATA["level"],
+                "severity": METADATA["severity"],
+                "message":  f'<img> missing alt attribute — src="{src}"',
+                "element":  str(img),
+                "fix_hint": METADATA["fix_hint"],
+                "url":      url,
+}
 
             findings.append(finding)
 
