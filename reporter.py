@@ -40,6 +40,47 @@ SEVERITY_META = {
     },
 }
 
+# Severity weights for risk score calculation.
+SEVERITY_WEIGHTS = {
+    "critical": 10,
+    "high":      5,
+    "medium":    2,
+    "low":       1,
+    "info":      0,
+}
+# Score bands — label and description.
+RISK_BANDS = [
+    (0,   0,   "PASS",     "No issues detected."),
+    (1,   10,  "LOW",      "Minor issues only. Low risk to users."),
+    (11,  25,  "MODERATE", "Usability issues present. Remediation recommended."),
+    (26,  50,  "HIGH",     "Significant barriers present. Prompt remediation required."),
+    (51,  999, "CRITICAL", "Severe access barriers. Immediate remediation required."),
+]
+
+
+def calculate_risk_score(findings: list) -> tuple[int, str, str]:
+    """
+    Calculate the Mosley Risk Score from a list of findings.
+
+    Each finding is weighted by severity. The total score maps to a
+    named risk band.
+
+    Parameters:
+        findings (list): List of finding dicts from check modules.
+
+    Returns:
+        tuple: (score: int, band: str, description: str)
+    """
+    score = sum(
+        SEVERITY_WEIGHTS.get(f.get("severity", "low"), 0)
+        for f in findings
+    )
+
+    for low, high, band, description in RISK_BANDS:
+        if low <= score <= high:
+            return score, band, description
+
+    return score, "CRITICAL", RISK_BANDS[-1][3]
 
 def _sanitize_source(source: str) -> str:
     """
@@ -94,6 +135,7 @@ def generate_report(source: str, findings: list) -> str:
     total = len(findings)
     if total == 0:
         lines.append("[OK] PASS — No accessibility issues detected.")
+        lines.append("  [>] Mosley Risk Score : 0 — PASS")
         lines.append("")
         lines.append("     All checks passed. No findings to report.")
         lines.append("")
@@ -114,7 +156,11 @@ def generate_report(source: str, findings: list) -> str:
 
         status = "[!] FAIL" if blocking > 0 else "[>] REVIEW"
 
+        score, band, band_desc = calculate_risk_score(findings)
+
         lines.append(f"{status} — {total} finding(s) detected")
+        lines.append(f"  [>] Mosley Risk Score : {score} — {band}")
+        lines.append(f"       {band_desc}")
         lines.append("")
         lines.append("  By severity:")
         lines.append(f"    [!] Critical : {critical_count}")
