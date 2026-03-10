@@ -3,20 +3,14 @@
 # Wires together: input validation, HTML loading, all ten checks, and reporting.
 
 import argparse
+import importlib
+import pkgutil
 from bs4 import BeautifulSoup
 
+import checks
 import config
 from utils.logger import masLog
 from utils.fetcher import load_html
-from checks.alt_text import run as check_alt_text
-from checks.headings import check_headings
-from checks.labels import check_labels
-from checks.lang_attr import check_lang_attr
-from checks.tabindex import check_tabindex
-from checks.empty_links import check_empty_links
-from checks.empty_buttons import check_empty_buttons
-from checks.autoplay import check_autoplay
-from checks.pdf_links import check_pdf_links
 from reporter import generate_report
 
 def run_audit(source: str) -> None:
@@ -38,17 +32,16 @@ def run_audit(source: str) -> None:
     soup = BeautifulSoup(html, config.HTML_PARSER)
     masLog("HTML parsed successfully")
 
-    # Step 3: Run all ten checks
+     # Step 3: Discover and run all check modules automatically.
+    # pkgutil.iter_modules walks the checks/ package directory.
+    # Any module that exposes a run() function is treated as a check.
+    # Adding a new check module to checks/ requires no changes here.
     all_findings = []
-    all_findings.extend(check_alt_text(soup))
-    all_findings.extend(check_headings(soup))
-    all_findings.extend(check_labels(soup))
-    all_findings.extend(check_lang_attr(soup))
-    all_findings.extend(check_tabindex(soup))
-    all_findings.extend(check_empty_links(soup))
-    all_findings.extend(check_empty_buttons(soup))
-    all_findings.extend(check_autoplay(soup))
-    all_findings.extend(check_pdf_links(soup))
+    for finder, module_name, _ in pkgutil.iter_modules(checks.__path__):
+        module = importlib.import_module(f"checks.{module_name}")
+        if hasattr(module, "run"):
+            masLog(f"Running module: checks.{module_name}")
+            all_findings.extend(module.run(soup, source))
 
     # Step 4: Print summary to terminal
     print(f"Checks complete — {len(all_findings)} finding(s) found\n")
@@ -80,5 +73,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
