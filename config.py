@@ -55,4 +55,18 @@ REPORT_SEPARATOR = "-" * 60
 # created automatically if they don't exist yet.
 # exist_ok=True means no error is raised if the directory already exists — idempotent.
 os.makedirs(LOGS_DIR, exist_ok=True)
+
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+# --- Severity Taxonomy ---
+# Single source of truth for all severity levels used across every check module.
+# Checks reference these constants — never hardcode severity strings in check files.
+SEVERITY_CRITICAL  = "critical"
+SEVERITY_HIGH      = "high"
+SEVERITY_MEDIUM    = "medium"
+SEVERITY_LOW       = "low"
+SEVERITY_INFO      = "info"
+
+# --- Module Request Delay ---
+# Seconds to wait between HTTP requests when running multiple checks.
+# Prevents rate-limiting from target servers.
+MODULE_REQUEST_DELAY = 1.5
