@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import config
 from utils.logger import masLog
 from utils.fetcher import load_html
-from checks.alt_text import check_alt_text
+from checks.alt_text import run as check_alt_text
 from checks.headings import check_headings
 from checks.labels import check_labels
 from checks.lang_attr import check_lang_attr
@@ -80,4 +80,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
