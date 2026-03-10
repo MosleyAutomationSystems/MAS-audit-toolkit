@@ -8,8 +8,16 @@
 
 from bs4 import BeautifulSoup
 from utils.logger import masLog
+import config
+METADATA = {
+    "name":     "Keyboard Focus Order",
+    "wcag":     "2.4.3",
+    "level":    "A",
+    "severity": config.SEVERITY_CRITICAL,
+    "fix_hint": "Replace tabindex values greater than 0 with tabindex='0' to preserve the natural DOM focus order.",
+}
 
-def check_tabindex(soup: BeautifulSoup) -> list:
+def run(soup: BeautifulSoup, url: str = "") -> list:
     """
     Find all elements with a tabindex value greater than 0.
 
@@ -20,7 +28,7 @@ def check_tabindex(soup: BeautifulSoup) -> list:
         list: A list of finding dictionaries for each violating element.
     """
 
-    masLog("Running check: tabindex values")
+    masLog(f"Running check: {METADATA['name']}")
 
     findings = []
 
@@ -52,16 +60,15 @@ def check_tabindex(soup: BeautifulSoup) -> list:
             text = el.get_text(strip=True)[:40] or "[no text]"
 
             findings.append({
-                "check":    "Keyboard Trap / Focus Order",
-                "wcag":     "2.4.3",
-                "level":    "A",
-                "severity": "critical",
-                "message":  (
-                    f'<{tag}> has tabindex="{value}" — '
-                    f'positive tabindex disrupts natural focus order. '
-                    f'id="{id_}", text="{text}"'
-                )
-            })
+                  "check":    METADATA["name"],
+                  "wcag":     METADATA["wcag"],
+                  "level":    METADATA["level"],  
+                  "severity": METADATA["severity"],  
+                  "message":  f'<{tag}> has tabindex="{value}" — positive tabindex disrupts natural focus order. id="{id_}", text="{text}"',
+                  "element":  str(el),    
+                  "fix_hint": METADATA["fix_hint"],  
+                  "url":      url,    
+})
 
     if findings:
         masLog(f"Tabindex check: {len(findings)} issue(s) found", level="warning")
