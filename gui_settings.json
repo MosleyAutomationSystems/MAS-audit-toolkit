@@ -1,0 +1,14 @@
+{
+  "theme": "Dark",
+  "font_family": "Consolas",
+  "font_size": 14,
+  "dyslexia_preset": "Normal",
+  "word_spacing": "Normal",
+  "line_height": 1.5,
+  "cvd_mode": "Normal",
+  "brightness": 1.0,
+  "contrast": 1.0,
+  "saturation": 1.0,
+  "hue_shift": 0,
+  "large_targets": false
+}

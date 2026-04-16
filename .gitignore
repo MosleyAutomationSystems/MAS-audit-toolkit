@@ -1,0 +1,18 @@
+# Runtime directories — generated at runtime, not part of the codebase
+logs/
+output/
+
+# Python cache files — generated automatically, never committed
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Virtual environment — if you add one later
+venv/
+.venv/
+
+# VS Code workspace settings — machine-specific
+.vscode/
+
+# Test files — internal use only, not part of the public toolkit
+test_*.py
