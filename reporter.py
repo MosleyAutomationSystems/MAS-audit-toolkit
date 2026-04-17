@@ -286,9 +286,10 @@ def generate_report(source: str, findings: list) -> str:
     lines.append("    outline:none detection, fieldset/legend check, autocomplete attribute check, multiple nav label check,")
     lines.append("    skip link target validation, main uniqueness check, lang on language switches, small text detection,")
     lines.append("    justified text detection, all-caps text detection, mailto link warning, document link warning,")
-    lines.append("    aria-hidden on focusable elements,aria-required consistency, aria-describedby orphan check, aria-role validity check,")
+    lines.append("    aria-hidden on focusable elements, aria-required consistency, aria-describedby orphan check, aria-role validity check,")
     lines.append("    image map check, rtl direction check, meta description check,")
-    lines.append("    robots meta tag check, mixed content check, third-party script detection, ")
+    lines.append("    robots meta tag check, mixed content check, third-party script detection, muted autoplay extension,")
+    lines.append("    background audio check, HTTP header analysis, carousel/slider autoplay check.")
     lines.append("")
     lines.append(
         "Note: This report covers a defined subset of WCAG 2.1 AA criteria. "

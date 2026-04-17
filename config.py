@@ -350,4 +350,28 @@ MODULES = {
         "tier":    1,
         "price":   15,
     },
+
+    "muted_autoplay": {
+        "enabled": True,
+        "tier":    1,
+        "price":   20,
+    },
+
+    "background_audio": {
+        "enabled": True,
+        "tier":    1,
+        "price":   20,
+    },
+
+    "http_header_analyzer": {
+        "enabled": True,
+        "tier":    1,
+        "price":   25,
+    },
+
+    "carousel_autoplay": {
+        "enabled": True,
+        "tier":    1,
+        "price":   25,
+    },
 }

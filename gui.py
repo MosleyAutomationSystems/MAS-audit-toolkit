@@ -747,9 +747,43 @@ class AuditApp(tk.Tk):
                  ).grid(row=2, column=0, sticky="ew")
 
     def _redraw_ui(self):
+        # Save current results content and source entry value before destroying.
+        saved_results = ""
+        saved_source  = ""
+        if hasattr(self, 'results_box'):
+            saved_results = self.results_box.get("1.0", tk.END)
+        if hasattr(self, 'source_var'):
+            saved_source = self.source_var.get()
+
         for w in self.winfo_children():
             w.destroy()
         self._build_ui()
+
+        # Restore source entry.
+        if saved_source:
+            self.source_var.set(saved_source)
+
+        # Restore results content.
+        if saved_results.strip():
+            self.results_box.config(state="normal")
+            self.results_box.delete("1.0", tk.END)
+            for line in saved_results.splitlines(keepends=True):
+                stripped = line.lstrip()
+                if stripped.startswith("[!] ") and "—" in line:
+                    tag = "error"
+                elif stripped.startswith("[OK]"):
+                    tag = "success"
+                elif stripped.startswith("[>] ") or stripped.startswith("[>]"):
+                    tag = "muted"
+                elif stripped.startswith("[") and "]" in stripped[:5]:
+                    tag = "error"
+                elif "─" in line or line.strip().startswith("-" * 10):
+                    tag = "muted"
+                else:
+                    tag = "muted"
+                self.results_box.insert(tk.END, line, tag)
+            self.results_box.config(state="disabled")
+
         self.source_entry.focus_set()
 
     def _open_settings(self):
@@ -869,7 +903,7 @@ class AuditApp(tk.Tk):
 
             report_path = generate_report(source, all_findings)
             self._write_result(
-                f"{CUE_INFO}Report saved to:\n{report_path}\n", tag="muted")
+                f"{CUE_INFO}Report saved to:\n{report_path}\n", tag="success")
 
             count = len(all_findings)
             msg = (f"Audit complete. {count} finding{'s' if count != 1 else ''} found."
