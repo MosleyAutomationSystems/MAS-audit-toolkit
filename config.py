@@ -93,6 +93,12 @@ LARGE_TOUCH_TARGET = 48   # Mosley Standard Category 5 override — Large Target
 # Default is "AA" — AAA conformance is not legally required.
 WCAG_REPORT_LEVEL = "AA"
 
+# --- Plain Language Report (C17) ---
+# When True, appends a plain-language summary section to the audit report.
+# Translates technical findings into client-readable descriptions.
+# Default is True — disable only if generating machine-readable output.
+PLAIN_LANGUAGE_REPORT = True
+
 # --- Module Registry ---
 # Single source of truth for all check modules in the checks/ package.
 # Each entry controls whether the module is active and records its metadata.
@@ -370,6 +376,12 @@ MODULES = {
     },
 
     "carousel_autoplay": {
+        "enabled": True,
+        "tier":    1,
+        "price":   25,
+    },
+
+    "aria_live_region": {
         "enabled": True,
         "tier":    1,
         "price":   25,

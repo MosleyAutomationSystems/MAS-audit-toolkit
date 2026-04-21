@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 
 import config
+import plain_language
 from utils.logger import masLog
 
 # Severity display order — Critical first, Minor last.
@@ -271,6 +272,33 @@ def generate_report(source: str, findings: list) -> str:
             if check_name not in seen_aaa and fix_hint:
                 lines.append(f"    [>] {check_name}: {fix_hint}")
                 seen_aaa.add(check_name)
+    
+        lines.append(config.REPORT_SEPARATOR)
+        lines.append("")
+
+    # ── Plain Language Summary (C17) ──
+    # Rendered when PLAIN_LANGUAGE_REPORT is True in config.py.
+    # Uses plain_language.py lookup table — check name → client-readable sentence.
+    # Only findings with a matching key are included. Unknown check names are skipped silently.
+    if config.PLAIN_LANGUAGE_REPORT and findings:
+        lines.append("[>] PLAIN LANGUAGE SUMMARY")
+        lines.append("    What this report means for your website visitors.")
+        lines.append("")
+
+        seen_plain = set()
+        for finding in findings:
+            check_name = finding.get("check", "")
+            if check_name in seen_plain:
+                continue
+            description = plain_language.PLAIN_LANGUAGE.get(check_name)
+            if not description:
+                continue
+            seen_plain.add(check_name)
+            severity = finding.get("severity", "low")
+            prefix = "[!]" if severity in ("critical", "high", "medium") else "[>]"
+            lines.append(f"  {prefix} {check_name}")
+            lines.append(f"      {description}")
+            lines.append("")
 
         lines.append(config.REPORT_SEPARATOR)
         lines.append("")
@@ -290,6 +318,7 @@ def generate_report(source: str, findings: list) -> str:
     lines.append("    image map check, rtl direction check, meta description check,")
     lines.append("    robots meta tag check, mixed content check, third-party script detection, muted autoplay extension,")
     lines.append("    background audio check, HTTP header analysis, carousel/slider autoplay check.")
+    lines.append("    aria-live region detection.")
     lines.append("")
     lines.append(
         "Note: This report covers a defined subset of WCAG 2.1 AA criteria. "
