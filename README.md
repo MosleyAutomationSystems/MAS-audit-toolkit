@@ -139,6 +139,17 @@ python audit.py path/to/file.html
 python audit.py --help
 ```
 
+**CLI features:**
+
+- Runs all 15 check modules against any URL or local HTML file
+- Findings grouped by severity (Critical → High → Medium → Low → Info)
+- Each finding includes WCAG criterion, line number, element context, and remediation step
+- Mosley Risk Score printed at summary
+- Report saved automatically to `/output` with timestamped filename
+- All activity logged to `/logs`
+- Platform Detection flags CMS-locked sites as PLATFORM RESTRICTED
+- AAA findings suppressed by default — enable via `WCAG_REPORT_LEVEL = "AAA"` in `config.py`
+
 ---
 
 ## Output
