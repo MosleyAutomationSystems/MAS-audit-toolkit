@@ -12,7 +12,7 @@ CIS Student · Michigan Reconnect Scholar · Grand Rapids Community College
 
 ## What It Does
 
-Runs 15 automated accessibility checks against any webpage or local HTML file.  
+Runs 19 automated accessibility checks against any webpage or local HTML file.  
 Findings are grouped by severity (Critical → Info), mapped to WCAG 2.1 AA criteria,  
 and each finding includes a suggested remediation step.
 
@@ -22,7 +22,7 @@ All findings are risk indicators — not compliance verdicts.
 
 ---
 
-## Check Modules (15 Built)
+## Check Modules (19 Built)
 
 ### WCAG Checks — Level A
 
@@ -42,6 +42,10 @@ All findings are risk indicators — not compliance verdicts.
 | 12 | Landmark Roles | 2.4.1 | High |
 | 13 | Skip Navigation Link | 2.4.1 | High |
 | 14 | Accessibility Patterns | 2.4.4 | Varies |
+| 16 | Viewport Meta Check | 1.4.4 | Critical |
+| 21 | iframe Title Check | 4.1.2 | High |
+| 35 | aria-hidden on Focusable Elements | 4.1.2 | Critical |
+| 38 | ARIA Role Validity | 4.1.2 | High |
 
 ### Platform Detection
 
@@ -140,7 +144,7 @@ python audit.py --help
 
 **CLI features:**
 
-- Runs all 15 check modules against any URL or local HTML file
+- Runs all 19 check modules against any URL or local HTML file
 - Findings grouped by severity (Critical → High → Medium → Low → Info)
 - Each finding includes WCAG criterion, element context, and remediation step
 - Mosley Risk Score printed at summary
@@ -178,14 +182,17 @@ MAS-audit-toolkit/
 ├── requirements.txt      — Python dependencies
 ├── README.md             — This file
 ├── gui_settings.json     — Persisted GUI preferences (auto-generated on first run)
-├── checks/               — 15 check modules (auto-discovered)
+├── checks/               — 19 check modules (auto-discovered)
 │   ├── __init__.py
 │   ├── alt_text.py
+│   ├── aria_hidden_focusable.py
+│   ├── aria_role_validity.py
 │   ├── autoplay.py
 │   ├── duplicate_ids.py
 │   ├── empty_buttons.py
 │   ├── empty_links.py
 │   ├── headings.py
+│   ├── iframe_title.py
 │   ├── labels.py
 │   ├── landmark_roles.py
 │   ├── lang_attr.py
@@ -194,7 +201,8 @@ MAS-audit-toolkit/
 │   ├── platform_detection.py
 │   ├── skip_link.py
 │   ├── tabindex.py
-│   └── title_element.py
+│   ├── title_element.py
+│   └── viewport_meta.py
 ├── utils/
 │   ├── __init__.py
 │   ├── fetcher.py        — URL and file HTML loader
@@ -220,7 +228,7 @@ WCAG_REPORT_LEVEL = "AAA"
 
 ## Paid License
 
-The free open-source tier includes 15 built modules. A paid desktop license  
+The free open-source tier includes 19 built modules. A paid desktop license  
 adds all future modules as they ship, extended customization features, branded  
 PDF/DOCX report export, and batch scanning via CLI.
 
