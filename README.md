@@ -12,7 +12,7 @@ CIS Student · Michigan Reconnect Scholar · Grand Rapids Community College
 
 ## What It Does
 
-Runs 44 automated accessibility checks against any webpage or local HTML file.  
+Runs 15 automated accessibility checks against any webpage or local HTML file.  
 Findings are grouped by severity (Critical → Info), mapped to WCAG 2.1 AA criteria,  
 and each finding includes a suggested remediation step.
 
@@ -22,7 +22,7 @@ All findings are risk indicators — not compliance verdicts.
 
 ---
 
-## Check Modules (44 Built)
+## Check Modules (15 Built)
 
 ### WCAG Checks — Level A
 
@@ -42,56 +42,12 @@ All findings are risk indicators — not compliance verdicts.
 | 12 | Landmark Roles | 2.4.1 | High |
 | 13 | Skip Navigation Link | 2.4.1 | High |
 | 14 | Accessibility Patterns | 2.4.4 | Varies |
-| 16 | Viewport Meta Check | 1.4.4 | Critical |
-| 18 | Table Scope Attributes | 1.3.1 | High |
-| 19 | Figure/Figcaption Check | 1.1.1 | Medium |
-| 21 | iframe Title Check | 4.1.2 | High |
-| 22 | SVG Accessibility Check | 1.1.1 | High |
-| 24 | Fieldset/Legend Check | 1.3.1 | High |
-| 26 | Multiple Nav Label Check | 2.4.1 | Medium |
-| 27 | Skip Link Target Validation | 2.4.1 | High |
-| 28 | Main Uniqueness Check | 1.3.1 | High |
-| 33 | Mailto Link Warning | 2.4.4 | Low |
-| 34 | Document Link Warning | 2.4.4 | Low |
-| 35 | aria-hidden on Focusable Elements | 4.1.2 | Critical |
-| 36 | aria-required Consistency | 4.1.2 | High |
-| 37 | aria-describedby Orphan Check | 4.1.2 | High |
-| 38 | ARIA Role Validity | 4.1.2 | High |
-| 39 | Image Map Check | 1.1.1 | High |
-| 40 | RTL Direction Check | 1.3.2 | High |
-
-### WCAG Checks — Level AA
-
-| # | Module | WCAG | Severity |
-|---|--------|------|----------|
-| 17 | Touch Target CSS Check | 2.5.5 | Medium |
-| 20 | Animated GIF Detection | 2.3.1 | Low |
-| 23 | outline:none Detection | 2.4.7 | High |
-| 25 | Autocomplete Attribute | 1.3.5 | Medium |
-| 29 | Lang on Language Switches | 3.1.2 | Medium |
-| 30 | Small Text Detection | 1.4.4 | Medium |
-
-### WCAG Checks — Level AAA (separate bucket, excluded from risk score)
-
-| # | Module | WCAG | Severity |
-|---|--------|------|----------|
-| 31 | Justified Text Detection | 1.4.8 | Low |
-| 32 | All-Caps Text Detection | 1.4.8 | Low |
 
 ### Platform Detection
 
 | # | Module | Notes |
 |---|--------|-------|
-| 15 | Platform Detection | Identifies 19 CMS platforms across 4 signal vectors. Flags platform-locked sites. |
-
-### Mosley Standard Checks (MS)
-
-| # | Module | Severity |
-|---|--------|----------|
-| 41 | Meta Description Check | Info |
-| 42 | Robots Meta Check | Info |
-| 43 | Mixed Content Check | Critical (active) / High (passive) |
-| 44 | Third-Party Script Risk | Info |
+| 15 | Platform Detection | Identifies 19 CMS platforms across 4 signal vectors. Flags platform-locked sites as PLATFORM RESTRICTED. |
 
 ---
 
@@ -212,11 +168,23 @@ MAS-audit-toolkit/
 ├── requirements.txt      — Python dependencies
 ├── README.md             — This file
 ├── gui_settings.json     — Persisted GUI preferences (auto-generated on first run)
-├── checks/               — 44 check modules (auto-discovered)
+├── checks/               — 15 check modules (auto-discovered)
 │   ├── __init__.py
 │   ├── alt_text.py
+│   ├── autoplay.py
+│   ├── duplicate_ids.py
+│   ├── empty_buttons.py
+│   ├── empty_links.py
 │   ├── headings.py
-│   ├── ... (44 modules total)
+│   ├── labels.py
+│   ├── landmark_roles.py
+│   ├── lang_attr.py
+│   ├── patterns.py
+│   ├── pdf_links.py
+│   ├── platform_detection.py
+│   ├── skip_link.py
+│   ├── tabindex.py
+│   └── title_element.py
 ├── utils/
 │   ├── __init__.py
 │   ├── fetcher.py        — URL and file HTML loader
@@ -230,14 +198,27 @@ MAS-audit-toolkit/
 
 ## WCAG Report Level
 
-By default the toolkit runs in AA mode. AAA findings (justified text, all-caps text)  
-are detected but suppressed from the main report and excluded from the risk score.
+By default the toolkit runs in AA mode. AAA findings are detected but suppressed  
+from the main report and excluded from the risk score.
 
 To include AAA findings, set in `config.py`:
 
 ```python
 WCAG_REPORT_LEVEL = "AAA"
 ```
+
+---
+
+## Paid License
+
+The free open-source tier includes 15 built modules. A paid desktop license  
+adds all future modules as they ship, extended customization features, branded  
+PDF/DOCX report export, and batch scanning via CLI.
+
+Individual license — $129 one-time · 1 seat  
+Small Agency license — $259 one-time · 1–5 seats
+
+Contact: mosleyautomationsystems@gmail.com
 
 ---
 
@@ -267,6 +248,13 @@ WCAG_REPORT_LEVEL = "AAA"
 | Word spacing | Normal / Wide / Wider presets |
 | Line height | 1.0–3.0× slider with reset |
 | Large Targets toggle | Scales GUI interactive elements to 48px (Mosley Standard Category 5) |
+
+---
+
+## Known Issues
+
+Git Bash on Windows may display `▒` characters in CLI output instead of separator lines.  
+This is a terminal encoding artifact only — CMD and the desktop GUI render correctly.
 
 ---
 
