@@ -3,7 +3,7 @@
 A command-line and desktop accessibility auditing tool built to the Mosley Standard.  
 Accepts a URL or local HTML file and produces a structured, timestamped plain-text  
 report mapping findings to WCAG 2.1 AA success criteria, with severity grouping,  
-line numbers, parent context, and suggested remediation for every finding.
+element context, and suggested remediation for every finding.
 
 Built by Damascus Mosley — Mosley Automation Systems (MAS)  
 CIS Student · Michigan Reconnect Scholar · Grand Rapids Community College
@@ -56,18 +56,17 @@ All findings are risk indicators — not compliance verdicts.
 Every finding includes:
 
 - Severity level and WCAG criterion
-- Source line number (where available)
-- Finding message with element identifier
+- Element identifier and context
+- Finding message
 - Suggested remediation step
 
 ```
 [!] CRITICAL — Immediate Accessibility Barriers
 
-  [1] aria-hidden on Focusable Elements — WCAG 4.1.2 (Level A)
-       Line 42
-       <button> has aria-hidden="true" but is still keyboard focusable.
-       Remediation: Never place aria-hidden="true" on an element that can
-       receive keyboard focus. Use display:none or tabindex="-1" instead.
+  [1] Alt Text Detection — WCAG 1.1.1 (Level A)
+       <img src="hero.jpg"> is missing an alt attribute.
+       Remediation: Add a descriptive alt attribute. If the image is
+       decorative, use alt="" to hide it from assistive technology.
 ```
 
 The Mosley Risk Score summarizes the audit in a single number mapped to a named band:
@@ -143,7 +142,7 @@ python audit.py --help
 
 - Runs all 15 check modules against any URL or local HTML file
 - Findings grouped by severity (Critical → High → Medium → Low → Info)
-- Each finding includes WCAG criterion, line number, element context, and remediation step
+- Each finding includes WCAG criterion, element context, and remediation step
 - Mosley Risk Score printed at summary
 - Report saved automatically to `/output` with timestamped filename
 - All activity logged to `/logs`
@@ -209,10 +208,9 @@ MAS-audit-toolkit/
 
 ## WCAG Report Level
 
-By default the toolkit runs in AA mode. AAA findings are detected but suppressed  
-from the main report and excluded from the risk score.
+The free tier runs in AA mode. AAA module detection is available in the paid desktop license.
 
-To include AAA findings, set in `config.py`:
+To enable AAA findings in the paid license, set in `config.py`:
 
 ```python
 WCAG_REPORT_LEVEL = "AAA"
